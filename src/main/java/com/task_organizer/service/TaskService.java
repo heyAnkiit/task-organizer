@@ -60,7 +60,12 @@ public class TaskService {
     }
 
     @Log
-    public void deleteTaskById(Long taskId) {
+    public void deleteTaskById(Long taskId) throws TaskNotFoundException, NotEnoughPermissionException {
+        Task task = getTask(taskId);
+        String loggedInUser = auditConfiguration.getLoggedInUser();
+        if (!task.getCreatedBy().equalsIgnoreCase(loggedInUser)) {
+            throw new NotEnoughPermissionException("You do not have enough permissions to delete this task.");
+        }
         taskRepository.deleteById(taskId);
     }
 

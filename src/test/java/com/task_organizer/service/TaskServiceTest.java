@@ -43,7 +43,7 @@ class TaskServiceTest {
     private AuditConfiguration auditConfiguration;
 
     @Test
-    void testCreateTask_Success() {
+    void testCreateTask() {
         CreateTaskRequest createTaskRequest = getCreateTaskRequest();
         Task task = getTask();
 
@@ -142,14 +142,19 @@ class TaskServiceTest {
     }
 
     @Test
-    void testDeleteTaskById() {
+    void testDeleteTaskById() throws TaskNotFoundException, NotEnoughPermissionException {
+        Task task = getTask();
         Long taskId = 1L;
+        String loggedInUser = "johnDoe";
+        when(auditConfiguration.getLoggedInUser()).thenReturn(loggedInUser);
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+
         taskService.deleteTaskById(taskId);
         verify(taskRepository).deleteById(taskId);
     }
 
     @Test
-    void testUpdateTask_Success() throws TaskNotFoundException {
+    void testUpdateTask() throws TaskNotFoundException {
         Task updatedTask = getTask();
         updatedTask.setTitle("Updated Task");
 
@@ -171,7 +176,7 @@ class TaskServiceTest {
 
 
     @Test
-    void testTransitionStatus_Success() throws TaskNotFoundException {
+    void testTransitionStatus() throws TaskNotFoundException {
         Task task = getTask();
         TransitionTaskStatusRequest request = getTransitionTaskStatusRequest();
 
